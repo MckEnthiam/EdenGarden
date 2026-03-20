@@ -29,5 +29,5 @@ def get_db():
 
 
 def init_db():
-    from models import compartment, document, quiz_session, professor_profile, contradiction  # noqa: F401
+    from models import compartment, document, quiz_session, professor_profile  # noqa: F401
     Base.metadata.create_all(bind=engine)

@@ -1,7 +1,9 @@
 .exam-page {
-  padding: 24px;
+  padding: 24px 24px 80px;
   max-width: 800px;
   margin: 0 auto;
+  height: 100%;
+  overflow-y: auto;
 }
 
 .exam-banner {

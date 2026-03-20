@@ -3,6 +3,7 @@ from datetime import datetime
 from sqlalchemy import String, Float, Integer, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from db.database import Base
+from typing import Optional
 
 
 class QuizSession(Base):
@@ -23,5 +24,5 @@ class QuizAnswer(Base):
     expected_answer: Mapped[str] = mapped_column(String, nullable=False)
     user_answer: Mapped[str] = mapped_column(String, nullable=False, default="")
     is_correct: Mapped[bool] = mapped_column(Boolean, default=False)
-    source_chunk_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("chunks.id"), nullable=True)
+    source_chunk_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("chunks.id"), nullable=True)
     source_page: Mapped[int] = mapped_column(Integer, default=1)

@@ -40,10 +40,10 @@ function CompartmentFolder({ comp, isActive, onClick }: CompartmentFolderProps) 
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
     >
-      <div className="folder-tab" style={{ background: accentColor }}>
+      <div className="folder-tab" style={{ background: isActive ? 'var(--color-folder-tab-bg)' : accentColor }}>
         <span className="folder-tab-name">{comp.name.substring(0, 10)}</span>
       </div>
-      <div className="folder-body" style={{ borderLeftColor: isActive ? '#1D9E75' : '' }}>
+      <div className="folder-body" style={{ borderLeftColor: isActive ? 'var(--color-folder-active-border)' : '' }}>
         {comp.contradiction_count > 0 && (
           <span className="contradiction-dot" title="Contradictions non lues" />
         )}
@@ -67,7 +67,7 @@ interface SidebarProps {
 
 export default function Sidebar({ onNewCompartment, onOpenSettings }: SidebarProps) {
   const { compartments, activeCompartmentId, setActiveCompartment } = useCompartmentStore()
-  const { theme, setTheme, providerLabel, provider } = useSettingsStore()
+  const { theme, mode, setMode, providerLabel, provider } = useSettingsStore()
 
   const providerColors: Record<string, string> = {
     groq: '#F55036',
@@ -81,7 +81,7 @@ export default function Sidebar({ onNewCompartment, onOpenSettings }: SidebarPro
     <aside className="sidebar">
       <div className="sidebar-logo">
         <span>EDEN</span>
-        <span className="logo-garden"> GARDEN</span>
+        <span className="logo-garden">GARDEN</span>
       </div>
 
       <button className="new-compartment-btn" onClick={onNewCompartment}>
@@ -114,12 +114,12 @@ export default function Sidebar({ onNewCompartment, onOpenSettings }: SidebarPro
       </button>
 
       <div className="sidebar-bottom">
-        <div className="theme-toggle" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Toggle theme">
-          <span className={theme === 'light' ? 'theme-icon active' : 'theme-icon'}>☀</span>
-          <div className={`theme-pill ${theme === 'light' ? 'light-mode' : ''}`}>
+        <div className="theme-toggle" onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')} title="Toggle theme">
+          <span className={mode === 'light' ? 'theme-icon active' : 'theme-icon'}>⏾</span>
+          <div className={`theme-pill ${mode === 'light' ? 'light-mode' : ''}`}>
             <div className="theme-thumb" />
           </div>
-          <span className={theme === 'dark' ? 'theme-icon active' : 'theme-icon'}>☽</span>
+          <span className={mode === 'dark' ? 'theme-icon active' : 'theme-icon'}>☀</span>
         </div>
         <div
           className={`model-badge ${provider === 'unknown' ? 'model-badge-none' : ''}`}

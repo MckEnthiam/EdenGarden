@@ -63,28 +63,25 @@ export default function SettingsPage({ onClose }: Props) {
 
       <div className="settings-section">
         <h3 className="section-title">Apparence</h3>
+        <p className="section-desc">Choisissez l'univers visuel de votre Eden Garden.</p>
         <div className="theme-grid">
-          <div
-            className={`theme-card ${theme === 'dark' ? 'active' : ''}`}
-            onClick={() => setTheme('dark')}
-          >
-            <div className="theme-preview dark-preview">
-              <span className="dot dot-bg" />
-              <span className="dot dot-accent" />
+          {[
+            { id: 'garden', name: 'Garden', color: '#3DAA4A' },
+            { id: 'ocean', name: 'Ocean', color: '#0096C7' },
+            { id: 'serious', name: 'Serious', color: '#5C5C5C' },
+            { id: 'icecream', name: 'Ice Cream', color: '#C68642' },
+          ].map((t) => (
+            <div
+              key={t.id}
+              className={`theme-card ${theme === t.id ? 'active' : ''}`}
+              onClick={() => setTheme(t.id as any)}
+            >
+              <div className="theme-preview" style={{ background: t.color }}>
+                <div className="theme-preview-inner" />
+              </div>
+              <div className="theme-name">{t.name}</div>
             </div>
-            <div className="theme-name">Sombre (Défaut)</div>
-          </div>
-          
-          <div
-            className={`theme-card ${theme === 'light' ? 'active' : ''}`}
-            onClick={() => setTheme('light')}
-          >
-            <div className="theme-preview light-preview">
-              <span className="dot dot-bg" />
-              <span className="dot dot-accent" />
-            </div>
-            <div className="theme-name">Clair</div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

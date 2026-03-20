@@ -3,8 +3,8 @@ export interface ElectronAPI {
   getApiKey: () => Promise<string>
   setApiKey: (key: string) => Promise<void>
   getBackendPort: () => Promise<number>
-  getTheme: () => Promise<'dark' | 'light'>
-  setTheme: (theme: 'dark' | 'light') => Promise<void>
+  getTheme: () => Promise<{ theme: string, mode: string }>
+  setTheme: (theme: { theme: string, mode: string }) => Promise<void>
 }
 
 declare global {

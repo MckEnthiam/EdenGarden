@@ -11,7 +11,7 @@ import SettingsPage from './pages/SettingsPage/SettingsPage'
 
 export default function App() {
   const { setCompartments, activeCompartmentId, setLoading } = useCompartmentStore()
-  const { theme, setTheme, setApiKey, addToast } = useSettingsStore()
+  const { theme, setTheme, mode, setMode, setApiKey, addToast } = useSettingsStore()
 
   const [wizardOpen, setWizardOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -23,8 +23,11 @@ export default function App() {
       // Load initial theme and API key from Electron storage if available
       try {
         if (window.electronAPI) {
-          const storedTheme = await window.electronAPI.getTheme()
-          if (storedTheme) setTheme(storedTheme)
+          const stored = await window.electronAPI.getTheme()
+          if (stored) {
+            setTheme(stored.theme as any)
+            setMode(stored.mode as any)
+          }
 
           const storedKey = await window.electronAPI.getApiKey()
           if (storedKey) setApiKey(storedKey)
@@ -42,10 +45,16 @@ export default function App() {
     init()
   }, [])
 
-  // Sync theme to document body
+  // Sync theme to document root
   useEffect(() => {
-    document.body.className = `theme-${theme}`
-  }, [theme])
+    document.documentElement.setAttribute('data-theme', theme)
+    document.documentElement.setAttribute('data-mode', mode)
+    
+    // Persist to Electron
+    if (window.electronAPI) {
+      window.electronAPI.setTheme({ theme, mode })
+    }
+  }, [theme, mode])
 
   // Fetch compartments once backend is ready
   useEffect(() => {

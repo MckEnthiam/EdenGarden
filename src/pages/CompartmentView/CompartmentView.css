@@ -147,7 +147,7 @@
 
 .cv-content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
   background: var(--color-bg-primary);
 }
 

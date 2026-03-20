@@ -20,7 +20,7 @@ def get_chroma_client() -> chromadb.PersistentClient:
 
 
 def get_collection(compartment_id: str) -> chromadb.Collection:
-    client = get_client()
+    client = get_chroma_client()
     collection_name = f"compartment_{compartment_id.replace('-', '_')}"
     return client.get_or_create_collection(
         name=collection_name,
@@ -29,7 +29,7 @@ def get_collection(compartment_id: str) -> chromadb.Collection:
 
 
 def delete_collection(compartment_id: str) -> None:
-    client = get_client()
+    client = get_chroma_client()
     collection_name = f"compartment_{compartment_id.replace('-', '_')}"
     try:
         client.delete_collection(collection_name)

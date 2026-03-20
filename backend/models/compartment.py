@@ -2,10 +2,9 @@ import uuid
 from datetime import datetime, date
 from sqlalchemy import String, Integer, DateTime, Date, JSON, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from datetime import datetime, date
 from typing import List, Optional
 
-from ..db.database import Base
+from db.database import Base
 
 class Compartment(Base):
     __tablename__ = "compartments"

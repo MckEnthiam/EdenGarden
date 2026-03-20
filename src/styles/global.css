@@ -20,13 +20,24 @@ body {
   color: var(--color-text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background 200ms ease, color 200ms ease;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--color-accent-primary) 50%, var(--color-border-strong) 50%); }
+::-webkit-scrollbar-thumb { 
+  background: var(--color-border-strong); 
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background var(--transition);
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: var(--color-accent-primary);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
 
 /* ── Typography helpers ──────────────────────────────────── */
 .mono-label { font-family: var(--font-mono-label); }

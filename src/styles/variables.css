@@ -1,66 +1,174 @@
 /* ── Eden Garden – Design System Variables ──────────────────────────── */
 
 :root {
-  /* Color Palette – Dark Mode (default) */
-  --color-bg-primary: #0F1117;
-  --color-bg-surface: #1A1D27;
-  --color-bg-surface-hover: #1F2233;
-
-  --color-accent-primary: #1D9E75;
-  --color-accent-secondary: #7F77DD;
-
-  --color-text-primary: #F0EFE9;
-  --color-text-secondary: #C8C6BE;
-  --color-text-muted: #888780;
-
-  --color-border: #2A2D3A;
-  --color-border-strong: #3A3E50;
-
-  --color-success: #1D9E75;
-  --color-warning: #E8A838;
-  --color-danger: #E05252;
-  --color-info: #7F77DD;
-
-  /* Sidebar folder tab */
-  --color-folder-tab-bg: #2E3247;
-  --color-folder-active-border: #1D9E75;
-
-  /* Typography */
+  /* Common variables (non-color) */
   --font-interface: 'Inter', system-ui, sans-serif;
   --font-mono-label: 'IBM Plex Mono', monospace;
   --font-mono-citation: 'JetBrains Mono', monospace;
-
-  /* Spacing */
   --sp-xs: 4px;
   --sp-sm: 8px;
   --sp-md: 16px;
   --sp-lg: 24px;
   --sp-xl: 40px;
   --sp-2xl: 64px;
-
-  /* Radii */
   --radius-inline: 6px;
   --radius-card: 10px;
   --radius-modal: 14px;
   --radius-btn: 8px;
-
-  /* Transitions */
   --transition: 150ms ease;
-
-  /* Sidebar */
   --sidebar-width: 260px;
+
+  /* Semantic defaults (will be overridden by theme/mode) */
+  --color-danger: #E05252;
+  --color-success: #1D9E75;
+  --color-warning: #E8A838;
 }
 
-/* ── Light Mode ─────────────────────────────────────────────────────── */
-[data-theme="light"] {
-  --color-bg-primary: #F5F5F0;
+/* ── GARDEN (Default) ──────────────────────────────────────────────── */
+[data-theme="garden"][data-mode="light"] {
+  --color-bg-primary: #F4F9ED;
   --color-bg-surface: #FFFFFF;
-  --color-bg-surface-hover: #F0F0EA;
-  --color-text-primary: #1A1D27;
-  --color-text-secondary: #444444;
-  --color-text-muted: #777770;
-  --color-border: #E0DED8;
-  --color-border-strong: #C8C6C0;
-  --color-folder-tab-bg: #E8E6DF;
-  --color-folder-active-border: #1D9E75;
+  --color-bg-surface-hover: #EBF2E2;
+  --color-accent-primary: #3DAA4A;
+  --color-accent-secondary: #A8C400;
+  --color-text-primary: #1C2B1E;
+  --color-text-secondary: #3D4F3F;
+  --color-text-muted: #7A8C7D;
+  --color-border: #C8DDB0;
+  --color-border-strong: #AEC791;
+  --color-folder-tab-bg: #3DAA4A;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #3DAA4A;
+  --color-code-bg: #E8F0DE;
+  --color-code-text: #2D4A30;
 }
+
+[data-theme="garden"][data-mode="dark"] {
+  --color-bg-primary: #0D1A0F;
+  --color-bg-surface: #122016;
+  --color-bg-surface-hover: #1A2E20;
+  --color-accent-primary: #1D9E75;
+  --color-accent-secondary: #5DBB3A;
+  --color-text-primary: #E8F5E0;
+  --color-text-secondary: #B8C7B0;
+  --color-text-muted: #6B7D6E;
+  --color-border: #1E3324;
+  --color-border-strong: #2D4D36;
+  --color-folder-tab-bg: #1D9E75;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #1D9E75;
+  --color-code-bg: #0A140C;
+  --color-code-text: #A8D1A0;
+}
+
+/* ── OCEAN ───────────────────────────────────────────────────────── */
+[data-theme="ocean"][data-mode="light"] {
+  --color-bg-primary: #EDF4FB;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-surface-hover: #E1EDF7;
+  --color-accent-primary: #0096C7;
+  --color-accent-secondary: #48CAE4;
+  --color-text-primary: #0A2240;
+  --color-text-secondary: #2C405E;
+  --color-text-muted: #6B82A1;
+  --color-border: #B8D8F0;
+  --color-border-strong: #92C0E5;
+  --color-folder-tab-bg: #0096C7;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #0096C7;
+  --color-code-bg: #E3F2FD;
+  --color-code-text: #01579B;
+}
+
+[data-theme="ocean"][data-mode="dark"] {
+  --color-bg-primary: #050D1A;
+  --color-bg-surface: #0A1628;
+  --color-bg-surface-hover: #12243D;
+  --color-accent-primary: #0096C7;
+  --color-accent-secondary: #023E8A;
+  --color-text-primary: #CAE4F7;
+  --color-text-secondary: #90AFC5;
+  --color-text-muted: #536D81;
+  --color-border: #0D2540;
+  --color-border-strong: #193B61;
+  --color-folder-tab-bg: #0096C7;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #0096C7;
+  --color-code-bg: #030A15;
+  --color-code-text: #81D4FA;
+}
+
+/* ── SERIOUS ─────────────────────────────────────────────────────── */
+[data-theme="serious"][data-mode="light"] {
+  --color-bg-primary: #F2F2F2;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-surface-hover: #E8E8E8;
+  --color-accent-primary: #5C5C5C;
+  --color-accent-secondary: #A0A0A0;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #4A4A4A;
+  --color-text-muted: #808080;
+  --color-border: #D0D0D0;
+  --color-border-strong: #B0B0B0;
+  --color-folder-tab-bg: #5C5C5C;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #5C5C5C;
+  --color-code-bg: #EAEAEA;
+  --color-code-text: #333333;
+}
+
+[data-theme="serious"][data-mode="dark"] {
+  --color-bg-primary: #111111;
+  --color-bg-surface: #1C1C1C;
+  --color-bg-surface-hover: #262626;
+  --color-accent-primary: #A0A0A0;
+  --color-accent-secondary: #666666;
+  --color-text-primary: #EDEDED;
+  --color-text-secondary: #B0B0B0;
+  --color-text-muted: #707070;
+  --color-border: #2A2A2A;
+  --color-border-strong: #3D3D3D;
+  --color-folder-tab-bg: #A0A0A0;
+  --color-folder-tab-text: #111111;
+  --color-folder-active-border: #A0A0A0;
+  --color-code-bg: #0D0D0D;
+  --color-code-text: #CCCCCC;
+}
+
+/* ── ICE CREAM ───────────────────────────────────────────────────── */
+[data-theme="icecream"][data-mode="light"] {
+  --color-bg-primary: #FDF6EE;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-surface-hover: #F8EDDF;
+  --color-accent-primary: #C68642;
+  --color-accent-secondary: #E8C99A;
+  --color-text-primary: #2C1A0E;
+  --color-text-secondary: #5C4033;
+  --color-text-muted: #9C8273;
+  --color-border: #E0C9A8;
+  --color-border-strong: #CDB38E;
+  --color-folder-tab-bg: #C68642;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #C68642;
+  --color-code-bg: #F5E6CC;
+  --color-code-text: #5D4037;
+}
+
+[data-theme="icecream"][data-mode="dark"] {
+  --color-bg-primary: #1A1008;
+  --color-bg-surface: #251809;
+  --color-bg-surface-hover: #322312;
+  --color-accent-primary: #C68642;
+  --color-accent-secondary: #6B3F1A;
+  --color-text-primary: #F5E6CC;
+  --color-text-secondary: #C8B092;
+  --color-text-muted: #826E5A;
+  --color-border: #3D2510;
+  --color-border-strong: #54371C;
+  --color-folder-tab-bg: #C68642;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #C68642;
+  --color-code-bg: #140C06;
+  --color-code-text: #FFCC80;
+}
+

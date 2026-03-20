@@ -1,10 +1,11 @@
 from __future__ import annotations
 import threading
 from sentence_transformers import SentenceTransformer
+from typing import Optional
 
 MODEL_NAME = "paraphrase-multilingual-MiniLM-L12-v2"
 
-_model: SentenceTransformer | None = None
+_model: Optional[SentenceTransformer] = None
 _lock = threading.Lock()
 
 

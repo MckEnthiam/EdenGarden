@@ -5,8 +5,9 @@ import numpy as np
 import cv2
 import easyocr
 import fitz  # PyMuPDF
+from typing import Optional
 
-READER: easyocr.Reader | None = None
+READER: Optional[easyocr.Reader] = None
 UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 

@@ -8,7 +8,10 @@ import Store from 'electron-store'
 const store = new Store<{
   apiKey: string
   backendPort: number
-  theme: 'dark' | 'light'
+  theme: {
+    theme: 'garden' | 'ocean' | 'serious' | 'icecream'
+    mode: 'light' | 'dark'
+  }
 }>()
 
 let mainWindow: BrowserWindow | null = null
@@ -27,7 +30,7 @@ function getFreePo(): Promise<number> {
   })
 }
 
-async function waitForBackend(port: number, retries = 30): Promise<void> {
+async function waitForBackend(port: number, retries = 600): Promise<void> {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/health`)
@@ -67,12 +70,20 @@ async function startBackend(): Promise<void> {
 
   console.log(`[Backend] Using Python executable at: ${pythonExe}`)
 
+  const venvDir = path.join(rootDir, '.venv')
+  const venvScripts = path.join(venvDir, 'Scripts')
+
   backendProcess = spawn(
     pythonExe,
     ['-m', 'uvicorn', 'main:app', '--host', '127.0.0.1', '--port', String(backendPort)],
     {
       cwd: backendDir,
-      env: { ...process.env, PYTHONUNBUFFERED: '1' },
+      env: { 
+        ...process.env, 
+        PYTHONUNBUFFERED: '1',
+        VIRTUAL_ENV: venvDir,
+        PATH: `${venvScripts}${path.delimiter}${process.env.PATH || ''}`
+      },
       stdio: ['ignore', 'pipe', 'pipe'],
     }
   )
@@ -130,8 +141,8 @@ async function createWindow(): Promise<void> {
 ipcMain.handle('get-api-key', () => store.get('apiKey', ''))
 ipcMain.handle('set-api-key', (_event, key: string) => { store.set('apiKey', key) })
 ipcMain.handle('get-backend-port', () => backendPort)
-ipcMain.handle('get-theme', () => store.get('theme', 'dark'))
-ipcMain.handle('set-theme', (_event, theme: 'dark' | 'light') => { store.set('theme', theme) })
+ipcMain.handle('get-theme', () => store.get('theme', { theme: 'garden', mode: 'light' }))
+ipcMain.handle('set-theme', (_event, theme: { theme: string, mode: string }) => { store.set('theme', theme) })
 
 app.whenReady().then(async () => {
   try {

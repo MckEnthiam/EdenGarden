@@ -39,7 +39,7 @@ function getFreePo() {
     server.on("error", reject);
   });
 }
-async function waitForBackend(port, retries = 30) {
+async function waitForBackend(port, retries = 600) {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/health`);
@@ -73,12 +73,19 @@ async function startBackend() {
     }
   }
   console.log(`[Backend] Using Python executable at: ${pythonExe}`);
+  const venvDir = path__namespace.join(rootDir, ".venv");
+  const venvScripts = path__namespace.join(venvDir, "Scripts");
   backendProcess = child_process.spawn(
     pythonExe,
     ["-m", "uvicorn", "main:app", "--host", "127.0.0.1", "--port", String(backendPort)],
     {
       cwd: backendDir,
-      env: { ...process.env, PYTHONUNBUFFERED: "1" },
+      env: {
+        ...process.env,
+        PYTHONUNBUFFERED: "1",
+        VIRTUAL_ENV: venvDir,
+        PATH: `${venvScripts}${path__namespace.delimiter}${process.env.PATH || ""}`
+      },
       stdio: ["ignore", "pipe", "pipe"]
     }
   );
@@ -129,7 +136,7 @@ electron.ipcMain.handle("set-api-key", (_event, key) => {
   store.set("apiKey", key);
 });
 electron.ipcMain.handle("get-backend-port", () => backendPort);
-electron.ipcMain.handle("get-theme", () => store.get("theme", "dark"));
+electron.ipcMain.handle("get-theme", () => store.get("theme", { theme: "garden", mode: "light" }));
 electron.ipcMain.handle("set-theme", (_event, theme) => {
   store.set("theme", theme);
 });

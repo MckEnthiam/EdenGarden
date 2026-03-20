@@ -1,6 +1,15 @@
+import os
+import sys
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+#
+# Important: these imports use the "backend root" as module base (e.g. `db.*`, `models.*`).
+# When this file is imported from outside the `backend/` directory, Python's sys.path
+# may not include `backend/`, causing `ModuleNotFoundError: No module named 'db'`.
+#
+sys.path.insert(0, os.path.dirname(__file__))
 
 from db.database import init_db
 from routers import compartments, documents, chat, quiz, exam, llm as llm_router, contradictions

@@ -6,13 +6,13 @@
   border-right: 0.5px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow-y: auto;
   flex-shrink: 0;
 }
 
 .sidebar-logo {
   font-family: var(--font-mono-label);
-  font-size: 13px;
+  font-size: 24px;
   text-transform: uppercase;
   letter-spacing: 0.2em;
   padding: 24px 20px 16px;
@@ -215,7 +215,7 @@
   width: 48px;
   height: 24px;
   background: var(--color-border);
-  border-radius: 999px;
+  border-radius: 10%;
   position: relative;
   display: flex;
   align-items: center;
@@ -225,7 +225,7 @@
 .theme-thumb {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  border-radius: 10%;
   background: var(--color-accent-primary);
   transition: transform 150ms ease;
 }
