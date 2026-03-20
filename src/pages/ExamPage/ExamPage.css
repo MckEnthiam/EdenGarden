@@ -1,0 +1,111 @@
+.exam-page {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.exam-banner {
+  background: color-mix(in srgb, var(--color-accent-secondary) 8%, transparent);
+  border-left: 3px solid var(--color-accent-secondary);
+  border-radius: 0 var(--radius-btn) var(--radius-btn) 0;
+  padding: 16px;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--color-text-primary);
+  margin-bottom: 24px;
+}
+
+.exam-generate-btn {
+  width: 100%;
+  height: 48px;
+  font-size: 15px;
+}
+
+.exam-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.exam-active {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.exam-header-infos {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.exam-meta-pill {
+  font-family: var(--font-mono-label);
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-inline);
+  padding: 6px 12px;
+}
+
+.exam-q-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.exam-q-card {
+  background: var(--color-bg-surface);
+  border: 0.5px solid var(--color-border);
+  border-radius: var(--radius-card);
+  padding: 20px;
+}
+
+.exam-q-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.exam-q-num {
+  font-family: var(--font-mono-label);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.exam-q-pts {
+  font-family: var(--font-mono-label);
+  font-size: 12px;
+  color: var(--color-accent-primary);
+}
+
+.exam-q-text {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+
+.exam-q-answer {
+  background: color-mix(in srgb, var(--color-success) 4%, transparent);
+  border-left: 2px solid var(--color-success);
+  padding: 12px 16px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.exam-q-answer-label {
+  font-family: var(--font-mono-label);
+  font-size: 11px;
+  color: var(--color-success);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.exam-q-source {
+  font-family: var(--font-mono-label);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  text-align: right;
+}

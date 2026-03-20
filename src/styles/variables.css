@@ -1,0 +1,66 @@
+/* ── Eden Garden – Design System Variables ──────────────────────────── */
+
+:root {
+  /* Color Palette – Dark Mode (default) */
+  --color-bg-primary: #0F1117;
+  --color-bg-surface: #1A1D27;
+  --color-bg-surface-hover: #1F2233;
+
+  --color-accent-primary: #1D9E75;
+  --color-accent-secondary: #7F77DD;
+
+  --color-text-primary: #F0EFE9;
+  --color-text-secondary: #C8C6BE;
+  --color-text-muted: #888780;
+
+  --color-border: #2A2D3A;
+  --color-border-strong: #3A3E50;
+
+  --color-success: #1D9E75;
+  --color-warning: #E8A838;
+  --color-danger: #E05252;
+  --color-info: #7F77DD;
+
+  /* Sidebar folder tab */
+  --color-folder-tab-bg: #2E3247;
+  --color-folder-active-border: #1D9E75;
+
+  /* Typography */
+  --font-interface: 'Inter', system-ui, sans-serif;
+  --font-mono-label: 'IBM Plex Mono', monospace;
+  --font-mono-citation: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --sp-xs: 4px;
+  --sp-sm: 8px;
+  --sp-md: 16px;
+  --sp-lg: 24px;
+  --sp-xl: 40px;
+  --sp-2xl: 64px;
+
+  /* Radii */
+  --radius-inline: 6px;
+  --radius-card: 10px;
+  --radius-modal: 14px;
+  --radius-btn: 8px;
+
+  /* Transitions */
+  --transition: 150ms ease;
+
+  /* Sidebar */
+  --sidebar-width: 260px;
+}
+
+/* ── Light Mode ─────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --color-bg-primary: #F5F5F0;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-surface-hover: #F0F0EA;
+  --color-text-primary: #1A1D27;
+  --color-text-secondary: #444444;
+  --color-text-muted: #777770;
+  --color-border: #E0DED8;
+  --color-border-strong: #C8C6C0;
+  --color-folder-tab-bg: #E8E6DF;
+  --color-folder-active-border: #1D9E75;
+}
