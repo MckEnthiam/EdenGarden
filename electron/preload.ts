@@ -6,6 +6,12 @@ export interface ElectronAPI {
   getBackendPort: () => Promise<number>
   getTheme: () => Promise<{ theme: string, mode: string }>
   setTheme: (theme: { theme: string, mode: string }) => Promise<void>
+  getSession: () => Promise<any>
+  setSession: (session: any) => Promise<void>
+  clearSession: () => Promise<void>
+  refreshGoogleToken: () => Promise<any>
+  startGoogleOAuth: () => Promise<any>
+  retryBackend: () => void
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -14,4 +20,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getBackendPort: () => ipcRenderer.invoke('get-backend-port'),
   getTheme: () => ipcRenderer.invoke('get-theme'),
   setTheme: (theme: { theme: string, mode: string }) => ipcRenderer.invoke('set-theme', theme),
+  getSession: () => ipcRenderer.invoke('get-session'),
+  setSession: (session: any) => ipcRenderer.invoke('set-session', session),
+  clearSession: () => ipcRenderer.invoke('clear-session'),
+  refreshGoogleToken: () => ipcRenderer.invoke('refresh-google-token'),
+  startGoogleOAuth: () => ipcRenderer.invoke('start-google-oauth'),
+  retryBackend: () => ipcRenderer.send('retry-backend'),
 } satisfies ElectronAPI)

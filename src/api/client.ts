@@ -12,16 +12,76 @@ export async function getBaseUrl(): Promise<string> {
   return _baseUrl
 }
 
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+export async function getAuthHeaders(): Promise<Record<string, string>> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  const session = await window.electronAPI?.getSession()
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`
+  }
+  return headers
+}
+
+async function handleAuthErrorResponse(res: Response): Promise<never> {
+  let errBody: any = {}
+  try {
+    errBody = await res.json()
+  } catch {
+    errBody = { detail: res.statusText }
+  }
+
+  const tokenExpired = errBody?.error === 'token_expired' || errBody?.detail?.error === 'token_expired'
+
+  if (res.status === 401) {
+    if (tokenExpired) {
+      try {
+        const refreshedSession = await window.electronAPI?.refreshGoogleToken()
+        if (refreshedSession) {
+          await window.electronAPI?.setSession(refreshedSession)
+          window.dispatchEvent(new CustomEvent('sessionRefreshed', { detail: refreshedSession }))
+          throw new Error('token_refreshed')
+        }
+      } catch {
+        await window.electronAPI?.clearSession()
+        window.dispatchEvent(new Event('sessionExpired'))
+        throw new Error('token_expired')
+      }
+    }
+
+    await window.electronAPI?.clearSession()
+    window.dispatchEvent(new Event('sessionExpired'))
+    throw new Error(errBody?.error || errBody?.detail || 'Unauthorized')
+  }
+
+  throw new Error(errBody?.error || errBody?.detail || res.statusText)
+}
+
+async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const base = await getBaseUrl()
+  const authHeaders = await getAuthHeaders()
   const res = await fetch(`${base}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      ...authHeaders,
+      ...options.headers,
+    },
     ...options,
   })
+
   if (!res.ok) {
+    if (res.status === 401) {
+      try {
+        await handleAuthErrorResponse(res)
+      } catch (err: any) {
+        if (err?.message === 'token_refreshed') {
+          // Retry once after refresh
+          return apiFetch(path, options)
+        }
+        throw err
+      }
+    }
     const err = await res.json().catch(() => ({ detail: res.statusText }))
     throw new Error(err.detail ?? 'API error')
   }
+
   return res.json()
 }
 
@@ -51,8 +111,15 @@ export const documentsApi = {
     form.append('compartment_id', compartmentId)
     form.append('api_key', apiKey)
     form.append('file', file)
-    const res = await fetch(`${base}/api/documents/upload`, { method: 'POST', body: form })
-    if (!res.ok) throw new Error('Upload failed')
+    const headers = await getAuthHeaders()
+    delete headers['Content-Type']
+    const res = await fetch(`${base}/api/documents/upload`, { method: 'POST', body: form, headers })
+    if (!res.ok) {
+      if (res.status === 401) {
+        await handleAuthErrorResponse(res)
+      }
+      throw new Error('Upload failed')
+    }
     return res.json()
   },
   uploadScan: async (compartmentId: string, file: File, apiKey: string): Promise<Document> => {
@@ -61,8 +128,15 @@ export const documentsApi = {
     form.append('compartment_id', compartmentId)
     form.append('api_key', apiKey)
     form.append('file', file)
-    const res = await fetch(`${base}/api/documents/scan`, { method: 'POST', body: form })
-    if (!res.ok) throw new Error('Scan upload failed')
+    const headers = await getAuthHeaders()
+    delete headers['Content-Type']
+    const res = await fetch(`${base}/api/documents/scan`, { method: 'POST', body: form, headers })
+    if (!res.ok) {
+      if (res.status === 401) {
+        await handleAuthErrorResponse(res)
+      }
+      throw new Error('Scan upload failed')
+    }
     return res.json()
   },
   delete: (id: string) =>
@@ -120,6 +194,12 @@ export const contradictionsApi = {
     apiFetch<Contradiction[]>(`/api/contradictions/${compartmentId}`),
   markRead: (id: string) =>
     apiFetch<{ marked_read: boolean }>(`/api/contradictions/${id}/read`, { method: 'POST' }),
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────
+export const authApi = {
+  validate: () => apiFetch<{ valid: boolean; user_id: string; email: string; display_name: string }>('/api/auth/validate'),
+  me: () => apiFetch<{ id: string; google_id: string; email: string; display_name: string; avatar_url?: string }>('/api/auth/user'),
 }
 
 // ── LLM ──────────────────────────────────────────────────────────────

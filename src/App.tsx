@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getBaseUrl, compartmentsApi } from './api/client'
+import { getBaseUrl, compartmentsApi, authApi } from './api/client'
 import { useCompartmentStore } from './stores/compartmentStore'
 import { useSettingsStore } from './stores/settingsStore'
 
@@ -8,6 +8,7 @@ import WizardModal from './components/WizardModal/WizardModal'
 import ToastContainer from './components/Toast/Toast'
 import CompartmentView from './pages/CompartmentView/CompartmentView'
 import SettingsPage from './pages/SettingsPage/SettingsPage'
+import LoginPage from './pages/LoginPage/LoginPage'
 
 export default function App() {
   const { setCompartments, activeCompartmentId, setLoading } = useCompartmentStore()
@@ -16,11 +17,15 @@ export default function App() {
   const [wizardOpen, setWizardOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [backendReady, setBackendReady] = useState(false)
+  const [session, setSession] = useState<any>(null)
+  const [checkingSession, setCheckingSession] = useState(true)
 
   // Initialization: load theme, API key, and fetch compartment list
   useEffect(() => {
     async function init() {
       // Load initial theme and API key from Electron storage if available
+      let storedSession: any = null
+
       try {
         if (window.electronAPI) {
           const stored = await window.electronAPI.getTheme()
@@ -31,16 +36,40 @@ export default function App() {
 
           const storedKey = await window.electronAPI.getApiKey()
           if (storedKey) setApiKey(storedKey)
+
+          storedSession = await window.electronAPI.getSession()
+          if (storedSession && storedSession.expires_at > Date.now()) {
+            setSession(storedSession)
+          } else {
+            storedSession = null
+            await window.electronAPI.clearSession()
+          }
         }
       } catch { /* ignore */ }
 
       // Wait for backend to be ready via the getBaseUrl helper
+      let backendIsReady = false
       try {
         await getBaseUrl()
-        setBackendReady(true)
+        backendIsReady = true
       } catch {
         addToast('danger', 'Impossible de se connecter au backend local.')
       }
+
+      if (backendIsReady && storedSession) {
+        try {
+          await authApi.validate()
+          setSession(storedSession)
+        } catch {
+          await window.electronAPI?.clearSession()
+          setSession(null)
+        }
+      }
+
+      if (backendIsReady) {
+        setBackendReady(true)
+      }
+      setCheckingSession(false)
     }
     init()
   }, [])
@@ -49,16 +78,51 @@ export default function App() {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     document.documentElement.setAttribute('data-mode', mode)
-    
+
+    const onSessionExpired = () => {
+      setSession(null)
+      addToast('warning', "Session expirée, veuillez vous reconnecter.")
+    }
+
+    const onSessionRefreshed = (event: Event) => {
+      const detail = (event as CustomEvent).detail
+      if (detail) setSession(detail)
+    }
+
+    window.addEventListener('sessionExpired', onSessionExpired)
+    window.addEventListener('sessionRefreshed', onSessionRefreshed)
+
     // Persist to Electron
     if (window.electronAPI) {
       window.electronAPI.setTheme({ theme, mode })
     }
-  }, [theme, mode])
+
+    return () => {
+      window.removeEventListener('sessionExpired', onSessionExpired)
+      window.removeEventListener('sessionRefreshed', onSessionRefreshed)
+    }
+  }, [theme, mode, addToast])
+
+  // Validity check for existing session after backend is ready
+  useEffect(() => {
+    if (!backendReady || !session) return
+
+    async function validateSession() {
+      try {
+        await compartmentsApi.list()
+      } catch (e) {
+        await window.electronAPI?.clearSession()
+        setSession(null)
+        addToast('danger', 'Session invalide. Veuillez vous reconnecter.')
+      }
+    }
+
+    validateSession()
+  }, [backendReady, session, addToast])
 
   // Fetch compartments once backend is ready
   useEffect(() => {
-    if (!backendReady) return
+    if (!backendReady || !session) return
 
     async function loadCompartments() {
       setLoading(true)
@@ -72,10 +136,10 @@ export default function App() {
     }
 
     loadCompartments()
-  }, [backendReady])
+  }, [backendReady, session, setCompartments, setLoading, addToast])
 
   // Top level render before backend is connected
-  if (!backendReady) {
+  if (!backendReady || checkingSession) {
     return (
       <div className="app-layout" style={{ alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
@@ -83,6 +147,17 @@ export default function App() {
           <div className="mono-label">DÉMARRAGE DU MOTEUR PYTHON...</div>
         </div>
       </div>
+    )
+  }
+
+  if (!session) {
+    return (
+      <LoginPage
+        onLogin={async (newSession) => {
+          setSession(newSession)
+          await window.electronAPI?.setSession(newSession)
+        }}
+      />
     )
   }
 

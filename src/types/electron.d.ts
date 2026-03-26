@@ -5,6 +5,11 @@ export interface ElectronAPI {
   getBackendPort: () => Promise<number>
   getTheme: () => Promise<{ theme: string, mode: string }>
   setTheme: (theme: { theme: string, mode: string }) => Promise<void>
+  getSession: () => Promise<any>
+  setSession: (session: any) => Promise<void>
+  clearSession: () => Promise<void>
+  refreshGoogleToken: () => Promise<any>
+  startGoogleOAuth: () => Promise<any>
 }
 
 declare global {

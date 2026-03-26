@@ -7,7 +7,7 @@ interface Props { onClose: () => void }
 
 export default function SettingsPage({ onClose }: Props) {
   const { apiKey, setApiKey, setProvider, theme, setTheme, addToast } = useSettingsStore()
-  const [localKey, setLocalKey] = useState(apiKey)
+  const [localKey, setLocalKey] = useState('')
   const [checking, setChecking] = useState(false)
 
   const handleSave = async () => {
@@ -83,6 +83,20 @@ export default function SettingsPage({ onClose }: Props) {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="settings-section">
+        <h3 className="section-title">Compte</h3>
+        <p className="section-desc">Déconnectez-vous de votre compte Google.</p>
+        <button
+          className="btn-outline"
+          onClick={async () => {
+            await window.electronAPI?.clearSession()
+            window.location.reload()
+          }}
+        >
+          Se déconnecter
+        </button>
       </div>
     </div>
   )

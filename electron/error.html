@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eden Garden - Erreur</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=IBM+Plex+Mono&display=swap');
+        
+        body {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #0F1117;
+            color: #E2E8F0;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 400px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'IBM Plex Mono', monospace;
+            letter-spacing: 0.2em;
+            color: #3DAA4A;
+            font-size: 20px;
+            margin-bottom: 32px;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 12px 0;
+            color: #FFFFFF;
+        }
+
+        p {
+            font-size: 15px;
+            color: #94A3B8;
+            line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        button {
+            background-color: #3DAA4A;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(61, 170, 74, 0.2);
+        }
+
+        button:hover {
+            background-color: #45bf53;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(61, 170, 74, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #475569;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">EDEN GARDEN</div>
+        <div class="icon">🌱⚠️</div>
+        <h1>Échec du démarrage</h1>
+        <p>Le moteur de l'application n'a pas pu démarrer dans les délais prévus. Veuillez réessayer.</p>
+        <button id="retry-btn">Réessayer</button>
+        <div class="footer">Délai d'attente : 10 secondes</div>
+    </div>
+
+    <script>
+        const retryBtn = document.getElementById('retry-btn');
+        retryBtn.addEventListener('click', () => {
+            retryBtn.disabled = true;
+            retryBtn.innerText = 'Redémarrage...';
+            window.electronAPI.retryBackend();
+        });
+    </script>
+</body>
+</html>
