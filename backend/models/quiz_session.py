@@ -10,6 +10,7 @@ class QuizSession(Base):
     __tablename__ = "quiz_sessions"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     compartment_id: Mapped[str] = mapped_column(String(36), ForeignKey("compartments.id"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     score: Mapped[float] = mapped_column(Float, default=0.0)
@@ -19,6 +20,7 @@ class QuizAnswer(Base):
     __tablename__ = "quiz_answers"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     session_id: Mapped[str] = mapped_column(String(36), ForeignKey("quiz_sessions.id"), nullable=False)
     question: Mapped[str] = mapped_column(String, nullable=False)
     expected_answer: Mapped[str] = mapped_column(String, nullable=False)

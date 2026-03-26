@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, date
-from sqlalchemy import String, Integer, DateTime, Date, JSON, Float
+from sqlalchemy import String, Integer, DateTime, Date, JSON, Float, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List, Optional
 
@@ -10,6 +10,7 @@ class Compartment(Base):
     __tablename__ = "compartments"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, index=True)
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     name: Mapped[str] = mapped_column(String(50))
     subject: Mapped[str] = mapped_column(String(100))
     professor_name: Mapped[str] = mapped_column(String(100))

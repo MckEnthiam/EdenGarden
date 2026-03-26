@@ -9,6 +9,7 @@ class Document(Base):
     __tablename__ = "documents"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     compartment_id: Mapped[str] = mapped_column(String(36), ForeignKey("compartments.id"), nullable=False)
     filename: Mapped[str] = mapped_column(String(300), nullable=False)
     source_type: Mapped[str] = mapped_column(String(20), nullable=False)  # "pdf_upload" | "scan"
@@ -20,6 +21,7 @@ class Chunk(Base):
     __tablename__ = "chunks"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     document_id: Mapped[str] = mapped_column(String(36), ForeignKey("documents.id"), nullable=False)
     compartment_id: Mapped[str] = mapped_column(String(36), ForeignKey("compartments.id"), nullable=False)
     content: Mapped[str] = mapped_column(String, nullable=False)

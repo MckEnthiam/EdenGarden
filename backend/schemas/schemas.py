@@ -90,11 +90,19 @@ class AnswerSubmit(BaseModel):
     api_key: str
 
 
+class QuizAnswerOut(BaseModel):
+    question: str
+    expected: str
+    given: str
+    correct: bool
+    source_page: int
+
+
 class QuizResult(BaseModel):
     score: float
     total: int
     correct: int
-    answers: list[dict]
+    answers: list[QuizAnswerOut]
 
 
 # ── Exam ──────────────────────────────────────────────────────

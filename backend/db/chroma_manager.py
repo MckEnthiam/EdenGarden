@@ -3,7 +3,8 @@ import chromadb
 from chromadb.config import Settings
 from chromadb.api.models.Collection import Collection
 
-CHROMA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "chroma")
+DATA_DIR = os.getenv("EDEN_DATA_DIR", os.path.join(os.path.dirname(__file__), "..", "data"))
+CHROMA_PATH = os.path.join(DATA_DIR, "chroma")
 os.makedirs(CHROMA_PATH, exist_ok=True)
 
 _client: chromadb.PersistentClient = None

@@ -54,8 +54,9 @@ async def check_contradictions(
                 if new_def["term"].lower() != other_def["term"].lower():
                     continue
 
-                emb_a = embed_text(new_def["definition"])
-                emb_b = embed_text(other_def["definition"])
+                import asyncio
+                emb_a = await asyncio.to_thread(embed_text, new_def["definition"])
+                emb_b = await asyncio.to_thread(embed_text, other_def["definition"])
 
                 import numpy as np
                 similarity = float(np.dot(emb_a, emb_b))

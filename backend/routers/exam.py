@@ -6,21 +6,21 @@ from models.compartment import Compartment
 from models.quiz_session import QuizAnswer
 from schemas.schemas import ExamGenerateRequest, ExamOut, ExamQuestion
 from services.exam import generate_exam
+from auth import get_current_user_id
 
 router = APIRouter()
 
 
 @router.post("/generate", response_model=ExamOut)
-async def generate_exam_endpoint(req: ExamGenerateRequest, db: Session = Depends(get_db)):
-    comp = db.query(Compartment).filter(Compartment.id == req.compartment_id).first()
+async def generate_exam_endpoint(req: ExamGenerateRequest, user_id: str = Depends(get_current_user_id), db: Session = Depends(get_db)):
+    comp = db.query(Compartment).filter(Compartment.id == req.compartment_id, Compartment.user_id == user_id).first()
     if not comp:
         raise HTTPException(status_code=404, detail="Compartiment introuvable")
 
     # Find weak chapters from quiz history (questions often wrong)
     wrong_answers = (
         db.query(QuizAnswer)
-        .join(QuizAnswer.session_id == None)
-        .filter(QuizAnswer.is_correct == False)
+        .filter(QuizAnswer.user_id == user_id, QuizAnswer.is_correct == False)
         .all()
     )
     weak_chapters: list[str] = []

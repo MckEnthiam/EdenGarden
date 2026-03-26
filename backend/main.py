@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 sys.path.insert(0, os.path.dirname(__file__))
 
 from db.database import init_db
-from routers import compartments, documents, chat, quiz, exam, llm as llm_router, contradictions
+from routers import compartments, documents, chat, quiz, exam, llm as llm_router, contradictions, auth
 
 
 @asynccontextmanager
@@ -38,8 +38,16 @@ app.include_router(quiz.router, prefix="/api/quiz", tags=["quiz"])
 app.include_router(exam.router, prefix="/api/exam", tags=["exam"])
 app.include_router(llm_router.router, prefix="/api/llm", tags=["llm"])
 app.include_router(contradictions.router, prefix="/api/contradictions", tags=["contradictions"])
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 
 
 @app.get("/health")
 async def health():
     return {"status": "ok", "version": "0.1.0"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("EDEN_BACKEND_PORT", "8000"))
+    uvicorn.run("main:app", host="127.0.0.1", port=port, log_level="info")
+

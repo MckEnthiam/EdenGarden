@@ -5,13 +5,14 @@ from db.database import get_db
 from models.compartment import Compartment
 from schemas.schemas import ChatMessage, ChatResponse
 from services.rag import rag_query
+from auth import get_current_user_id
 
 router = APIRouter()
 
 
 @router.post("/", response_model=ChatResponse)
-async def chat(message: ChatMessage, db: Session = Depends(get_db)):
-    comp = db.query(Compartment).filter(Compartment.id == message.compartment_id).first()
+async def chat(message: ChatMessage, user_id: str = Depends(get_current_user_id), db: Session = Depends(get_db)):
+    comp = db.query(Compartment).filter(Compartment.id == message.compartment_id, Compartment.user_id == user_id).first()
     if not comp:
         raise HTTPException(status_code=404, detail="Compartiment introuvable")
 

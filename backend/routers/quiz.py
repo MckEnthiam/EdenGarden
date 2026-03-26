@@ -8,10 +8,11 @@ from models.compartment import Compartment
 from models.quiz_session import QuizSession, QuizAnswer
 from schemas.schemas import (
     QuizGenerateRequest, QuizSessionOut, QuizQuestion,
-    AnswerSubmit, QuizResult
+    AnswerSubmit, QuizResult, QuizAnswerOut
 )
 from services.llm import call_llm
 from db.chroma_manager import get_all_chunks
+from auth import get_current_user_id
 
 router = APIRouter()
 
@@ -47,8 +48,8 @@ async def _generate_questions(compartment_id: str, n: int, quiz_type: str, comp:
 
 
 @router.post("/generate", response_model=QuizSessionOut)
-async def generate_quiz(req: QuizGenerateRequest, db: Session = Depends(get_db)):
-    comp = db.query(Compartment).filter(Compartment.id == req.compartment_id).first()
+async def generate_quiz(req: QuizGenerateRequest, user_id: str = Depends(get_current_user_id), db: Session = Depends(get_db)):
+    comp = db.query(Compartment).filter(Compartment.id == req.compartment_id, Compartment.user_id == user_id).first()
     if not comp:
         raise HTTPException(status_code=404, detail="Compartiment introuvable")
 
@@ -57,13 +58,14 @@ async def generate_quiz(req: QuizGenerateRequest, db: Session = Depends(get_db))
     )
 
     session_id = str(uuid.uuid4())
-    session = QuizSession(id=session_id, compartment_id=req.compartment_id, score=0.0)
+    session = QuizSession(id=session_id, user_id=user_id, compartment_id=req.compartment_id, score=0.0)
     db.add(session)
 
     questions_out = []
     for q in questions_raw:
         qa = QuizAnswer(
             id=str(uuid.uuid4()),
+            user_id=user_id,
             session_id=session_id,
             question=q.get("question", ""),
             expected_answer=q.get("expected_answer", ""),
@@ -108,13 +110,13 @@ async def submit_quiz(req: AnswerSubmit, db: Session = Depends(get_db)):
         if is_correct:
             correct += 1
 
-        results.append({
-            "question": answer.question,
-            "expected": answer.expected_answer,
-            "given": user_ans,
-            "correct": is_correct,
-            "source_page": answer.source_page,
-        })
+        results.append(QuizAnswerOut(
+            question=answer.question,
+            expected=answer.expected_answer,
+            given=user_ans,
+            correct=is_correct,
+            source_page=answer.source_page,
+        ))
 
     score = correct / len(answers) if answers else 0.0
     session.score = round(score * 100, 1)

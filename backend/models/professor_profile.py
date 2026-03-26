@@ -9,6 +9,7 @@ class ProfessorProfile(Base):
     __tablename__ = "professor_profiles"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     name: Mapped[str] = mapped_column(String(100), nullable=False)
     style_notes: Mapped[str] = mapped_column(Text, nullable=False, default="")
     detected_patterns: Mapped[dict] = mapped_column(JSON, nullable=False, default=dict)
@@ -19,6 +20,7 @@ class Contradiction(Base):
     __tablename__ = "contradictions"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), index=True)
     term: Mapped[str] = mapped_column(String(200), nullable=False)
     compartment_a_id: Mapped[str] = mapped_column(String(36), ForeignKey("compartments.id"), nullable=False)
     compartment_b_id: Mapped[str] = mapped_column(String(36), ForeignKey("compartments.id"), nullable=False)
