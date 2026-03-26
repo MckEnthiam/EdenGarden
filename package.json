@@ -8,10 +8,13 @@
     "build": "tsc && vite build",
     "electron:dev": "concurrently -k \"vite\" \"electronmon .\" --prefix-colors cyan,magenta",
     "electron:build": "npm run build && electron-builder",
+    "dist": "npm run build && electron-builder --win",
     "preview": "vite preview"
   },
   "dependencies": {
+    "dotenv": "^17.3.1",
     "electron-store": "^8.2.0",
+    "googleapis": "^171.4.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "zustand": "^4.5.5"
@@ -29,19 +32,6 @@
     "vite": "^5.4.10",
     "vite-plugin-electron": "^0.28.8",
     "vite-plugin-electron-renderer": "^0.14.6"
-  },
-  "build": {
-    "appId": "com.eden-garden.app",
-    "productName": "Eden Garden",
-    "directories": {
-      "output": "release"
-    },
-    "files": [
-      "dist/**/*",
-      "dist-electron/**/*"
-    ],
-    "win": {
-      "target": "nsis"
-    }
   }
+
 }
