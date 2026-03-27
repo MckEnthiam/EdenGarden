@@ -1,0 +1,283 @@
+.course-settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: flex-end;
+  z-index: 40;
+}
+
+.course-settings-panel {
+  width: 380px;
+  max-width: 100%;
+  height: 100vh;
+  background: var(--color-bg-surface);
+  border-left: 0.5px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.course-settings-header {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.course-settings-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.course-settings-subject {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.cs-close-btn {
+  border: none;
+  background: none;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.course-settings-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 20px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cs-section {
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid var(--color-border);
+}
+
+.cs-section:last-of-type {
+  border-bottom: none;
+}
+
+.cs-section-label {
+  font-family: var(--font-mono-label);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.cs-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cs-field label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.cs-field input,
+.cs-field select {
+  font-size: 13px;
+}
+
+.cs-color-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.cs-color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-folder-tab-bg);
+}
+
+.cs-checkbox-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.cs-checkbox-row label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.cs-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.cs-docs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cs-doc-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.cs-doc-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-doc-name {
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-doc-meta {
+  font-family: var(--font-mono-label);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  display: flex;
+  gap: 8px;
+}
+
+.cs-doc-delete {
+  font-size: 11px;
+  border-radius: var(--radius-inline);
+  padding: 4px 8px;
+  border: 0.5px solid var(--color-danger);
+  color: var(--color-danger);
+  background: transparent;
+  cursor: pointer;
+}
+
+.cs-doc-delete:hover {
+  background: color-mix(in srgb, var(--color-danger) 10%, transparent);
+  color: #fff;
+}
+
+.cs-doc-empty {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.cs-doc-actions {
+  margin-top: 8px;
+}
+
+.cs-btn-outline {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: var(--radius-inline);
+  border: 0.5px solid var(--color-border);
+  background: transparent;
+  cursor: pointer;
+}
+
+.cs-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cs-stat-item {
+  padding: 8px;
+  border-radius: var(--radius-card);
+  background: var(--color-bg-surface-hover);
+}
+
+.cs-stat-label {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.cs-stat-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.cs-danger-zone {
+  background: color-mix(in srgb, var(--color-danger) 4%, transparent);
+  border-left: 3px solid var(--color-danger);
+  padding-left: 14px;
+}
+
+.cs-danger-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cs-btn-danger-outline,
+.cs-btn-danger {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: var(--radius-inline);
+  cursor: pointer;
+}
+
+.cs-btn-danger-outline {
+  border: 0.5px solid var(--color-danger);
+  background: transparent;
+  color: var(--color-danger);
+}
+
+.cs-btn-danger-outline:hover {
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: #fff;
+}
+
+.cs-btn-danger {
+  border: none;
+  background: color-mix(in srgb, var(--color-danger) 90%, #000);
+  color: #fff;
+}
+
+.cs-btn-danger:hover {
+  filter: brightness(1.05);
+}
+
+.course-settings-footer {
+  position: sticky;
+  bottom: 0;
+  padding: 10px 20px;
+  border-top: 0.5px solid var(--color-border);
+  background: linear-gradient(to top, var(--color-bg-surface), color-mix(in srgb, var(--color-bg-surface) 40%, transparent));
+}
+
+.cs-btn-save {
+  width: 100%;
+  padding: 10px;
+  border-radius: var(--radius-btn);
+  border: none;
+  cursor: pointer;
+  background: var(--color-success);
+  color: #fff;
+  font-weight: 500;
+}
+
+.cs-btn-save:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+

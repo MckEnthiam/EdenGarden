@@ -42,6 +42,12 @@
   margin-bottom: 6px;
 }
 
+.cv-title-main {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .cv-title-row h1 {
   font-size: 24px;
   font-weight: 600;
@@ -53,6 +59,22 @@
 .cv-badges {
   display: flex;
   gap: 8px;
+}
+
+.cv-course-settings-btn {
+  margin-left: auto;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: var(--radius-inline);
+  border: 0.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.cv-course-settings-btn:hover {
+  border-color: var(--color-accent-primary);
+  color: var(--color-accent-primary);
 }
 
 .cv-subtitle {

@@ -51,7 +51,7 @@ function getFreePort(): Promise<number> {
   })
 }
 
-async function waitForBackend(port: number, retries = 20): Promise<void> {
+async function waitForBackend(port: number, retries = 120): Promise<void> {
   for (let i = 0; i < retries; i++) {
     try {
       const response = await fetch(`http://127.0.0.1:${port}/health`)
@@ -351,7 +351,52 @@ app.whenReady().then(async () => {
   } catch (err) {
     console.error('Backend failed to start:', err)
     if (mainWindow) {
-      mainWindow.loadFile(path.join(__dirname, 'error.html'))
+      const html = `<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Eden Garden - Backend indisponible</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #0b1020;
+        color: #e6edf6;
+        font-family: Inter, Segoe UI, system-ui, sans-serif;
+      }
+      .card {
+        width: min(92vw, 680px);
+        background: #131a2e;
+        border: 1px solid #2a3558;
+        border-radius: 12px;
+        padding: 24px;
+      }
+      h1 { margin: 0 0 10px; font-size: 20px; }
+      p { margin: 0; opacity: 0.85; line-height: 1.5; }
+      code {
+        display: block;
+        margin-top: 14px;
+        padding: 10px 12px;
+        background: #0a1222;
+        border: 1px solid #263150;
+        border-radius: 8px;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Le backend local n'a pas démarré</h1>
+      <p>L'interface ne peut pas fonctionner sans backend. Redémarre l'application ou vérifie l'environnement Python.</p>
+      <code>${String(err)}</code>
+    </div>
+  </body>
+</html>`
+      await mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`)
     }
   }
 

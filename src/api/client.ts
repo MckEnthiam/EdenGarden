@@ -1,8 +1,8 @@
 // API base URL resolved from Electron backend port
 let _baseUrl: string | null = null
 
-export async function getBaseUrl(): Promise<string> {
-  if (_baseUrl) return _baseUrl
+export async function getBaseUrl(forceRefresh = false): Promise<string> {
+  if (_baseUrl && !forceRefresh) return _baseUrl
   try {
     const port = await window.electronAPI?.getBackendPort()
     _baseUrl = `http://127.0.0.1:${port ?? 8000}`
@@ -56,15 +56,27 @@ async function handleAuthErrorResponse(res: Response): Promise<never> {
 }
 
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const base = await getBaseUrl()
-  const authHeaders = await getAuthHeaders()
-  const res = await fetch(`${base}${path}`, {
-    headers: {
-      ...authHeaders,
-      ...options.headers,
-    },
-    ...options,
-  })
+  const doFetch = async (base: string) => {
+    const authHeaders = await getAuthHeaders()
+    return fetch(`${base}${path}`, {
+      headers: {
+        ...authHeaders,
+        ...options.headers,
+      },
+      ...options,
+    })
+  }
+
+  let base = await getBaseUrl()
+  let res: Response
+  try {
+    res = await doFetch(base)
+  } catch (err) {
+    // In Electron dev, backend process/port can change after reloads.
+    // Refresh the base URL once, then retry.
+    base = await getBaseUrl(true)
+    res = await doFetch(base)
+  }
 
   if (!res.ok) {
     if (res.status === 401) {
@@ -97,6 +109,18 @@ export const compartmentsApi = {
     apiFetch<Compartment>(`/api/compartments/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   delete: (id: string) =>
     apiFetch<{ deleted: boolean }>(`/api/compartments/${id}`, { method: 'DELETE' }),
+  stats: (id: string) =>
+    apiFetch<{
+      quiz_count: number
+      average_score: number
+      contradiction_count: number
+      created_at: string
+      chunk_count: number
+    }>(`/api/compartments/${id}/stats`),
+  resetQuizHistory: (id: string) =>
+    apiFetch<{ reset: boolean }>(`/api/compartments/${id}/quiz-history`, { method: 'DELETE' }),
+  deleteAllDocuments: (id: string) =>
+    apiFetch<{ deleted: boolean }>(`/api/compartments/${id}/documents`, { method: 'DELETE' }),
 }
 
 // ── Documents ─────────────────────────────────────────────────────────

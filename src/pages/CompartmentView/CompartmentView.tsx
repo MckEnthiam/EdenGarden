@@ -7,16 +7,25 @@ import ExamPage from '../ExamPage/ExamPage'
 import ContradictionsPage from '../ContradictionsPage/ContradictionsPage'
 import './CompartmentView.css'
 
-interface Props { compartmentId: string }
+interface Props {
+  compartmentId: string
+  onOpenSettings: (id: string) => void
+}
 
 type Tab = 'conversation' | 'documents' | 'quiz' | 'exam' | 'contradictions' | 'summary'
 
-export default function CompartmentView({ compartmentId }: Props) {
+export default function CompartmentView({ compartmentId, onOpenSettings }: Props) {
   const { compartments } = useCompartmentStore()
   const comp = compartments.find((c) => c.id === compartmentId)
   const [activeTab, setActiveTab] = useState<Tab>('conversation')
 
-  if (!comp) return null
+  if (!comp) {
+    return (
+      <div className="cv-summary-placeholder">
+        Ce compartiment n'existe plus. Rechargez la liste ou sélectionnez un autre cours.
+      </div>
+    )
+  }
 
   const getDaysUntilExam = (date: string | null) => {
     if (!date) return null
@@ -33,11 +42,19 @@ export default function CompartmentView({ compartmentId }: Props) {
         <div className="cv-watermark">{comp.name.replace(/[^A-Z0-9]/gi, '_').toUpperCase()}</div>
         <div className="cv-header-content">
           <div className="cv-title-row">
-            <h1>{comp.name}</h1>
-            <div className="cv-badges">
-              <span className="badge badge-accent">{comp.subject}</span>
-              {days !== null && <span className={`badge ${daysClass}`}>{daysText}</span>}
+            <div className="cv-title-main">
+              <h1>{comp.name}</h1>
+              <div className="cv-badges">
+                <span className="badge badge-accent">{comp.subject}</span>
+                {days !== null && <span className={`badge ${daysClass}`}>{daysText}</span>}
+              </div>
             </div>
+            <button
+              className="cv-course-settings-btn"
+              onClick={() => onOpenSettings(compartmentId)}
+            >
+              ⚙ Paramètres du cours
+            </button>
           </div>
           <div className="cv-subtitle">
             <span className="cv-prof-name">{comp.professor_name}</span>

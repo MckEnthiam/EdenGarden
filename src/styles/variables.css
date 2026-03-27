@@ -22,6 +22,23 @@
   --color-danger: #E05252;
   --color-success: #1D9E75;
   --color-warning: #E8A838;
+
+  /* Safe fallback palette (prevents black screen when theme attrs are missing/invalid) */
+  --color-bg-primary: #F4F9ED;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-surface-hover: #EBF2E2;
+  --color-accent-primary: #3DAA4A;
+  --color-accent-secondary: #A8C400;
+  --color-text-primary: #1C2B1E;
+  --color-text-secondary: #3D4F3F;
+  --color-text-muted: #7A8C7D;
+  --color-border: #C8DDB0;
+  --color-border-strong: #AEC791;
+  --color-folder-tab-bg: #3DAA4A;
+  --color-folder-tab-text: #FFFFFF;
+  --color-folder-active-border: #3DAA4A;
+  --color-code-bg: #E8F0DE;
+  --color-code-text: #2D4A30;
 }
 
 /* ── GARDEN (Default) ──────────────────────────────────────────────── */

@@ -22,9 +22,10 @@ interface CompartmentFolderProps {
   comp: Compartment
   isActive: boolean
   onClick: () => void
+  onOpenSettings: () => void
 }
 
-function CompartmentFolder({ comp, isActive, onClick }: CompartmentFolderProps) {
+function CompartmentFolder({ comp, isActive, onClick, onOpenSettings }: CompartmentFolderProps) {
   const accentColor = hashColor(comp.name)
   const days = getDaysUntilExam(comp.exam_date)
   const daysText = days !== null ? `${days}j` : ''
@@ -44,6 +45,16 @@ function CompartmentFolder({ comp, isActive, onClick }: CompartmentFolderProps) 
         <span className="folder-tab-name">{comp.name.substring(0, 10)}</span>
       </div>
       <div className="folder-body" style={{ borderLeftColor: isActive ? 'var(--color-folder-active-border)' : '' }}>
+        <button
+          className="folder-settings-btn"
+          onClick={(e) => {
+            e.stopPropagation()
+            onOpenSettings()
+          }}
+          title="Modifier le compartiment"
+        >
+          ✎
+        </button>
         {comp.contradiction_count > 0 && (
           <span className="contradiction-dot" title="Contradictions non lues" />
         )}
@@ -63,9 +74,10 @@ function CompartmentFolder({ comp, isActive, onClick }: CompartmentFolderProps) 
 interface SidebarProps {
   onNewCompartment: () => void
   onOpenSettings: () => void
+  onOpenCompartmentSettings: (id: string) => void
 }
 
-export default function Sidebar({ onNewCompartment, onOpenSettings }: SidebarProps) {
+export default function Sidebar({ onNewCompartment, onOpenSettings, onOpenCompartmentSettings }: SidebarProps) {
   const { compartments, activeCompartmentId, setActiveCompartment } = useCompartmentStore()
   const { theme, mode, setMode, providerLabel, provider } = useSettingsStore()
 
@@ -99,6 +111,7 @@ export default function Sidebar({ onNewCompartment, onOpenSettings }: SidebarPro
             comp={comp}
             isActive={activeCompartmentId === comp.id}
             onClick={() => setActiveCompartment(comp.id)}
+            onOpenSettings={() => onOpenCompartmentSettings(comp.id)}
           />
         ))}
       </div>
