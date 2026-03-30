@@ -51,20 +51,47 @@ export default function App() {
           if (storedKey) setApiKey(storedKey)
 
           storedSession = await window.electronAPI.getSession()
-          if (storedSession && storedSession.expires_at > Date.now()) {
-            setSession(storedSession)
-          } else {
-            storedSession = null
-            await window.electronAPI.clearSession()
+          if (storedSession) {
+            if (storedSession.mode === 'local') {
+              setSession(storedSession)
+            } else if (storedSession.expires_at > Date.now()) {
+              setSession(storedSession)
+            } else {
+              try {
+                const refreshed = await window.electronAPI.refreshGoogleToken?.()
+                if (refreshed) {
+                  storedSession = refreshed
+                  setSession(storedSession)
+                }
+              } catch {
+                storedSession = null
+                await window.electronAPI.clearSession()
+              }
+            }
           }
         }
       } catch { /* ignore */ }
 
-      // Wait for backend to be ready via the getBaseUrl helper
+      // Wait for backend to be ready via the health endpoint
       let backendIsReady = false
       try {
-        await getBaseUrl()
-        backendIsReady = true
+        const base = await getBaseUrl()
+        for (let i = 0; i < 60; i++) {
+          try {
+            const res = await fetch(`${base}/health`)
+            if (res.ok) {
+              backendIsReady = true
+              break
+            }
+          } catch {
+            // connection refused, wait and retry
+          }
+          await new Promise(r => setTimeout(r, 500))
+        }
+        
+        if (!backendIsReady) {
+          addToast('danger', 'Le backend local met trop de temps à démarrer.')
+        }
       } catch {
         addToast('danger', 'Impossible de se connecter au backend local.')
       }
@@ -104,11 +131,6 @@ export default function App() {
 
     window.addEventListener('sessionExpired', onSessionExpired)
     window.addEventListener('sessionRefreshed', onSessionRefreshed)
-
-    // Persist to Electron
-    if (window.electronAPI) {
-      window.electronAPI.setTheme({ theme, mode })
-    }
 
     return () => {
       window.removeEventListener('sessionExpired', onSessionExpired)
@@ -175,8 +197,10 @@ export default function App() {
       {!session ? (
         <LoginPage
           onLogin={async (newSession) => {
+            if (window.electronAPI) {
+              await window.electronAPI.setSession(newSession)
+            }
             setSession(newSession)
-            await window.electronAPI?.setSession(newSession)
           }}
         />
       ) : (

@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react'
 import { useChatStore } from '../../stores/chatStore'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { chatApi } from '../../api/client'
-import { ChatMessage } from '../../types/models'
+import { ChatMessage, SourceChunk } from '../../types/models'
+import PdfViewerPanel from '../../components/PdfViewerPanel/PdfViewerPanel'
 import './ConversationPage.css'
 
 const COMPARTMENT_TAG_RE = /\+([^+]+)\+/g
@@ -14,6 +15,8 @@ export default function ConversationPage({ compartmentId }: Props) {
   const { apiKey, addToast } = useSettingsStore()
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
+  const [pdfSource, setPdfSource] = useState<SourceChunk | null>(null)
+  const [pdfPanelOpen, setPdfPanelOpen] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const compMessages = messages[compartmentId] ?? []
@@ -56,6 +59,11 @@ export default function ConversationPage({ compartmentId }: Props) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
+  const handleSourceClick = (source: SourceChunk) => {
+    setPdfSource(source)
+    setPdfPanelOpen(true)
+  }
+
   const renderContent = (content: string) => {
     const parts = content.split(COMPARTMENT_TAG_RE)
     return parts.map((part, i) =>
@@ -82,7 +90,14 @@ export default function ConversationPage({ compartmentId }: Props) {
               {msg.sources && msg.sources.length > 0 && (
                 <div className="sources-row">
                   {msg.sources.map((s, i) => (
-                    <span key={i} className="source-chip" title={s.excerpt}>p.{s.page}</span>
+                    <span
+                      key={i}
+                      className="source-chip"
+                      title={s.chunk_text || `Page ${s.page}`}
+                      onClick={() => handleSourceClick(s)}
+                    >
+                      📄 {s.document_name ? `${s.document_name} – ` : ''}p.{s.page}
+                    </span>
                   ))}
                 </div>
               )}
@@ -122,6 +137,13 @@ export default function ConversationPage({ compartmentId }: Props) {
           </button>
         </div>
       </div>
+
+      <PdfViewerPanel
+        isOpen={pdfPanelOpen}
+        source={pdfSource}
+        onClose={() => setPdfPanelOpen(false)}
+      />
     </div>
   )
 }
+

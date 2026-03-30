@@ -14,7 +14,7 @@
     {
       "from": "backend/",
       "to": "backend/",
-      "filter": ["**/*", "!__pycache__", "!*.pyc"]
+      "filter": ["**/*", "!__pycache__", "!*.pyc", "!data/**/*"]
     }
   ],
   "asar": true,

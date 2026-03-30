@@ -18,6 +18,8 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   console.warn('GOOGLE_CLIENT_ID or GOOGLE_CLIENT_SECRET is missing in .env. Using placeholder values.');
 }
 
+app.name = 'eden-garden'
+
 const store = new Store<{
   apiKey: string
   backendPort: number
@@ -51,24 +53,59 @@ function getFreePort(): Promise<number> {
   })
 }
 
-async function waitForBackend(port: number, retries = 120): Promise<void> {
+async function waitForBackend(port: number, retries = 600): Promise<void> {
+  const http = require('http')
+  let lastError: any = null
   for (let i = 0; i < retries; i++) {
     try {
-      const response = await fetch(`http://127.0.0.1:${port}/health`)
-      if (response.ok) return
-    } catch {
-      // not ready yet
+      const isReadySnapshot = await new Promise<boolean>((resolve) => {
+        const req = http.get(`http://127.0.0.1:${port}/health`, (res: any) => {
+          resolve(res.statusCode === 200)
+        })
+        req.on('error', (err: any) => {
+          lastError = err
+          resolve(false)
+        })
+        req.setTimeout(500, () => {
+          req.destroy()
+          resolve(false)
+        })
+      })
+      if (isReadySnapshot) return
+      
+      // Log progress every 10 seconds
+      if (i % 20 === 0 && i > 0) {
+        console.log(`[Backend Wait] Still waiting... attempt ${i}/${retries}`)
+      }
+    } catch (err) {
+      lastError = err
     }
     await new Promise(r => setTimeout(r, 500))
   }
-  throw new Error(`Backend did not start on port ${port}`)
+  throw new Error(`Backend did not start on port ${port}. Last error: ${String(lastError)}`)
 }
 
 async function startBackend(): Promise<void> {
+  const isDev = !app.isPackaged
+
+  // In development, if a backend is already running on port 8000 (e.g., via Docker), just connect to it.
+  if (isDev) {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/health`)
+      if (response.ok) {
+        console.log('[Backend] Found existing backend on port 8000 (Docker or manual), connecting directly.')
+        backendPort = 8000
+        store.set('backendPort', backendPort)
+        return
+      }
+    } catch {
+      // no backend found, proceed to spawn locally
+    }
+  }
+
   backendPort = await getFreePort()
   store.set('backendPort', backendPort)
 
-  const isDev = !app.isPackaged
   const rootDir = isDev ? path.join(__dirname, '..') : path.join(process.resourcesPath)
   const backendDir = path.join(rootDir, 'backend')
 
@@ -193,6 +230,13 @@ ipcMain.handle('set-theme', (_event, theme: { theme: string, mode: string }) => 
 ipcMain.handle('get-session', () => store.get('session'))
 ipcMain.handle('set-session', (_event, session: any) => { store.set('session', session) })
 ipcMain.handle('clear-session', () => { store.delete('session') })
+ipcMain.handle('read-file-as-buffer', async (_event, filePath: string) => {
+  const data = fs.readFileSync(filePath)
+  return data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
+})
+ipcMain.handle('open-file-in-explorer', async (_event, filePath: string) => {
+  shell.showItemInFolder(filePath)
+})
 ipcMain.on('retry-backend', async () => {
   try {
     await startBackend()
@@ -345,6 +389,17 @@ ipcMain.handle('start-google-oauth', async (event) => {
 })
 
 app.whenReady().then(async () => {
+  const session = store.get('session') as any
+  if (session) {
+    if (session.mode === 'local') {
+      console.log("Session trouvée : local")
+    } else {
+      console.log("Session trouvée : google")
+    }
+  } else {
+    console.log("Aucune session, affichage login")
+  }
+
   try {
     await createWindow()
     await startBackend()
@@ -390,8 +445,8 @@ app.whenReady().then(async () => {
   </head>
   <body>
     <div class="card">
-      <h1>Le backend local n'a pas démarré</h1>
-      <p>L'interface ne peut pas fonctionner sans backend. Redémarre l'application ou vérifie l'environnement Python.</p>
+      <h1>Lancement de l'application, veuillez patienter...</h1>
+      <p>Le moteur d'IA et la base de données locale sont en train de s'initialiser. Cela peut prendre quelques instants selon votre machine.</p>
       <code>${String(err)}</code>
     </div>
   </body>

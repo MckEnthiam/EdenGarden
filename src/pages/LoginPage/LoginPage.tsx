@@ -7,6 +7,16 @@ interface LoginPageProps {
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
   const [loading, setLoading] = useState(false)
+  const [showLocalConfirm, setShowLocalConfirm] = useState(false)
+
+  const handleLocalLogin = () => {
+    onLogin({
+      mode: 'local',
+      user_id: 'local_user',
+      access_token: 'local_user',
+      expires_at: 9999999999999
+    })
+  }
 
   const handleGoogleLogin = async () => {
     if (!window.electronAPI) return
@@ -42,7 +52,33 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
           </svg>
           {loading ? 'Connexion...' : 'Continuer avec Google'}
         </button>
+        <button
+          className="local-login-btn"
+          onClick={() => setShowLocalConfirm(true)}
+          disabled={loading}
+          style={{ marginTop: 16, padding: '12px 24px', background: 'transparent', border: '1px solid var(--color-border)', borderRadius: 8, color: 'var(--color-text-muted)', cursor: 'pointer', fontFamily: 'inherit', fontSize: '14px', fontWeight: 500, transition: 'all 0.2s', width: '100%', maxWidth: '320px' }}
+        >
+          Continuer sans compte
+        </button>
       </div>
+
+      {showLocalConfirm && (
+        <div className="modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24, backdropFilter: 'blur(8px)' }}>
+          <div className="modal-content" style={{ background: 'var(--color-background, #131A2E)', padding: 32, borderRadius: 12, maxWidth: 480, border: '1px solid var(--color-border)', textAlign: 'center', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' }}>
+            <h3 style={{ marginTop: 0, marginBottom: 16, color: 'var(--color-text)', fontSize: 20 }}>Mode Local</h3>
+            <p style={{ color: 'var(--color-text-muted)', lineHeight: 1.6, marginBottom: 28, whiteSpace: 'pre-wrap', fontSize: 15 }}>
+              Vous êtes sur le point d'utiliser Eden Garden en mode local.{'\n'}
+              Vos données seront enregistrées uniquement sur cet appareil{'\n'}
+              et ne pourront pas être synchronisées ou récupérées depuis{'\n'}
+              un autre appareil.
+            </p>
+            <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
+              <button className="btn-outline" onClick={() => setShowLocalConfirm(false)} style={{ flex: 1 }}>Annuler</button>
+              <button className="btn-accent" onClick={handleLocalLogin} style={{ flex: 1 }}>Continuer en local</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

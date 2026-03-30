@@ -10,6 +10,8 @@ export interface ElectronAPI {
   clearSession: () => Promise<void>
   refreshGoogleToken: () => Promise<any>
   startGoogleOAuth: () => Promise<any>
+  readFileAsBuffer: (filePath: string) => Promise<ArrayBuffer>
+  openFileInExplorer: (filePath: string) => Promise<void>
 }
 
 declare global {
@@ -17,3 +19,4 @@ declare global {
     electronAPI?: ElectronAPI
   }
 }
+

@@ -12,6 +12,8 @@ export interface ElectronAPI {
   refreshGoogleToken: () => Promise<any>
   startGoogleOAuth: () => Promise<any>
   retryBackend: () => void
+  readFileAsBuffer: (filePath: string) => Promise<ArrayBuffer>
+  openFileInExplorer: (filePath: string) => Promise<void>
 }
 
 contextBridge.exposeInMainWorld('electronAPI', {
@@ -26,4 +28,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   refreshGoogleToken: () => ipcRenderer.invoke('refresh-google-token'),
   startGoogleOAuth: () => ipcRenderer.invoke('start-google-oauth'),
   retryBackend: () => ipcRenderer.send('retry-backend'),
+  readFileAsBuffer: (filePath: string) => ipcRenderer.invoke('read-file-as-buffer', filePath),
+  openFileInExplorer: (filePath: string) => ipcRenderer.invoke('open-file-in-explorer', filePath),
 } satisfies ElectronAPI)
+

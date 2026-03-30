@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { llmApi } from '../../api/client'
 import './SettingsPage.css'
@@ -9,6 +9,11 @@ export default function SettingsPage({ onClose }: Props) {
   const { apiKey, setApiKey, setProvider, theme, setTheme, addToast } = useSettingsStore()
   const [localKey, setLocalKey] = useState('')
   const [checking, setChecking] = useState(false)
+  const [isLocal, setIsLocal] = useState(false)
+
+  useEffect(() => {
+    window.electronAPI?.getSession().then(s => setIsLocal(s?.mode === 'local'))
+  }, [])
 
   const handleSave = async () => {
     setChecking(true)
@@ -74,7 +79,10 @@ export default function SettingsPage({ onClose }: Props) {
             <div
               key={t.id}
               className={`theme-card ${theme === t.id ? 'active' : ''}`}
-              onClick={() => setTheme(t.id as any)}
+              onClick={() => {
+                setTheme(t.id as any);
+                window.electronAPI?.setTheme({ theme: t.id, mode: useSettingsStore.getState().mode });
+              }}
             >
               <div className="theme-preview" style={{ background: t.color }}>
                 <div className="theme-preview-inner" />
@@ -87,7 +95,14 @@ export default function SettingsPage({ onClose }: Props) {
 
       <div className="settings-section">
         <h3 className="section-title">Compte</h3>
-        <p className="section-desc">Déconnectez-vous de votre compte Google.</p>
+        {isLocal ? (
+          <div>
+            <span style={{ display: 'inline-block', background: 'var(--color-border)', padding: '4px 8px', borderRadius: 4, fontSize: 13, fontWeight: 500, marginBottom: 8, color: 'var(--color-text)' }}>Mode local</span>
+            <p className="section-desc">Vous utilisez l'application sans compte en local.</p>
+          </div>
+        ) : (
+          <p className="section-desc">Déconnectez-vous de votre compte Google.</p>
+        )}
         <button
           className="btn-outline"
           onClick={async () => {

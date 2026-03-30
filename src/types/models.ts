@@ -22,8 +22,11 @@ export interface Document {
 }
 
 export interface SourceChunk {
+  document_id: string
+  document_name: string
+  file_path: string
   page: number
-  excerpt: string
+  chunk_text: string
 }
 
 export interface ChatMessage {
