@@ -53,8 +53,11 @@ class ChatMessage(BaseModel):
 
 
 class SourceChunk(BaseModel):
+    document_id: str = ""
+    document_name: str = ""
+    file_path: str = ""
     page: int
-    excerpt: str
+    chunk_text: str = ""
 
 
 class ChatResponse(BaseModel):

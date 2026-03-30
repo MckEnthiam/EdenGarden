@@ -1,8 +1,11 @@
 from __future__ import annotations
+import os
 import json
 from db.chroma_manager import query_collection
 from services.embeddings import embed_text
 from services.llm import call_llm
+
+UPLOAD_DIR = os.path.join(os.path.dirname(__file__), "..", "data", "uploads")
 
 
 def build_rag_context(chunks: list[str], metadatas: list[dict]) -> str:
@@ -53,8 +56,26 @@ async def rag_query(
 
     answer = await call_llm(messages, api_key)
 
-    sources = [
-        {"page": int(m.get("page_number", 0)), "excerpt": doc[:200]}
-        for doc, m in zip(docs, metas)
-    ]
+    # Enrich sources with document metadata for PDF viewer
+    from db.database import SessionLocal
+    from models.document import Document
+    db = SessionLocal()
+    try:
+        doc_ids = list({m.get("document_id") for m in metas if m.get("document_id")})
+        doc_records = {d.id: d for d in db.query(Document).filter(Document.id.in_(doc_ids)).all()}
+    finally:
+        db.close()
+
+    sources = []
+    for chunk_text, m in zip(docs, metas):
+        doc_id = m.get("document_id", "")
+        doc_rec = doc_records.get(doc_id)
+        sources.append({
+            "document_id": doc_id,
+            "document_name": doc_rec.filename if doc_rec else "unknown.pdf",
+            "file_path": os.path.join(UPLOAD_DIR, f"{doc_id}_{doc_rec.filename}") if doc_rec else "",
+            "page": int(m.get("page_number", 0)),
+            "chunk_text": chunk_text[:500],
+        })
+
     return {"answer": answer, "sources": sources}

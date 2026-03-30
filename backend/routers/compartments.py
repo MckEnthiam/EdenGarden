@@ -131,10 +131,68 @@ def delete_compartment(
     )
     if not c:
         raise HTTPException(status_code=404, detail="Compartiment introuvable")
+
+    # 1. Delete QuizAnswers (related to sessions of this compartment)
+    session_ids = [
+        s.id
+        for s in db.query(QuizSession.id)
+        .filter(QuizSession.compartment_id == compartment_id, QuizSession.user_id == user_id)
+        .all()
+    ]
+    if session_ids:
+        db.query(QuizAnswer).filter(
+            QuizAnswer.session_id.in_(session_ids), QuizAnswer.user_id == user_id
+        ).delete(synchronize_session=False)
+
+    # 2. Delete QuizSessions
+    db.query(QuizSession).filter(
+        QuizSession.compartment_id == compartment_id, QuizSession.user_id == user_id
+    ).delete(synchronize_session=False)
+
+    # 3. Delete Contradictions
+    db.query(Contradiction).filter(
+        ((Contradiction.compartment_a_id == compartment_id) | (Contradiction.compartment_b_id == compartment_id))
+        & (Contradiction.user_id == user_id)
+    ).delete(synchronize_session=False)
+
+    # 4. Delete Chunks
+    db.query(Chunk).filter(
+        Chunk.compartment_id == compartment_id, Chunk.user_id == user_id
+    ).delete(synchronize_session=False)
+
+    # 5. Delete Documents
+    db.query(Document).filter(
+        Document.compartment_id == compartment_id, Document.user_id == user_id
+    ).delete(synchronize_session=False)
+
+    # 6. Delete ProfessorProfile compartment references (cleanup JSON field)
+    from models.professor_profile import ProfessorProfile
+
+    profiles = db.query(ProfessorProfile).filter(ProfessorProfile.user_id == user_id).all()
+    for p in profiles:
+        if p.compartment_ids and compartment_id in p.compartment_ids:
+            new_ids = [cid for cid in p.compartment_ids if cid != compartment_id]
+            p.compartment_ids = new_ids
+
+    # 7. Cleanup same_prof_as references in other compartments
+    other_comps = (
+        db.query(Compartment)
+        .filter(Compartment.user_id == user_id, Compartment.id != compartment_id)
+        .all()
+    )
+    for oc in other_comps:
+        if oc.same_prof_as and compartment_id in oc.same_prof_as:
+            oc.same_prof_as = [cid for cid in oc.same_prof_as if cid != compartment_id]
+
+    # Finally, delete the Compartment itself
     db.delete(c)
     db.commit()
+
+    # ChromaDB cleanup
     from db.chroma_manager import delete_collection
+
     delete_collection(compartment_id)
+
     return {"deleted": True}
 
 

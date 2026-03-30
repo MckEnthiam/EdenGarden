@@ -26,5 +26,5 @@ async def chat(message: ChatMessage, user_id: str = Depends(get_current_user_id)
     )
     return ChatResponse(
         answer=result["answer"],
-        sources=[{"page": s["page"], "excerpt": s["excerpt"]} for s in result["sources"]],
+        sources=result["sources"],
     )

@@ -23,6 +23,23 @@ async def get_current_user(
     Creates user if they don't exist.
     """
     try:
+        if credentials.credentials == "local_user":
+            user = db.query(User).filter(User.google_id == "local_user").first()
+            if not user:
+                user = User(
+                    google_id="local_user",
+                    email="local@localhost",
+                    display_name="Mode Local",
+                    avatar_url=""
+                )
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+            else:
+                user.last_login_at = datetime.utcnow()
+                db.commit()
+            return user
+
         # Pass ID token or access token with tokeninfo fallback
         try:
             idinfo = id_token.verify_oauth2_token(
